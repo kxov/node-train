@@ -9,7 +9,7 @@ const receiveArgs = async (req) => {
   return JSON.parse(data);
 };
 
-module.exports = (routing, port) => {
+module.exports = (logger) => (routing, port) => {
   http.createServer(async (req, res) => {
     const { url, socket } = req;
     const [name, method, id] = url.substring(1).split('/');
@@ -22,10 +22,15 @@ module.exports = (routing, port) => {
     const args = [];
     if (signature.includes('(id')) args.push(id);
     if (signature.includes('{')) args.push(await receiveArgs(req));
-    console.log(`${socket.remoteAddress} ${method} ${url}`);
+    logger.log(`${socket.remoteAddress} ${method} ${url}`);
     const result = await handler(...args);
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
     res.end(JSON.stringify(result.rows));
   }).listen(port);
 
-  console.log(`API on port ${port}`);
+  logger.log(`API on port ${port}`);
 };

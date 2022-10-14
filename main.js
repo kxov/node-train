@@ -1,22 +1,24 @@
 'use strict';
 
+const config = require('./config.js');
+
 const fsp = require('fs').promises;
 const path = require('path');
-const server = require('./http.js');
+
+const logger = config.logger === 'native' ? require('./logger.js') : require('pino')();
+
+const server = require(`./${config.transport}.js`)(logger);
 const staticServer = require('./static.js');
 const load = require('./load.js');
-const db = require('./db.js');
+const db = require('./db.js')(config.db);
 const hash = require('./hash.js');
-const logger = require('./logger.js');
-
-const config = require('./config.js');
 
 const sandbox = {
   console: Object.freeze(logger),
   db: Object.freeze(db),
   common: { hash },
 };
-const apiPath = path.join(process.cwd(), config.apiRootPath);
+const apiPath = path.join(process.cwd(), config.api.path);
 const routing = {};
 
 (async () => {
@@ -25,9 +27,9 @@ const routing = {};
     if (!fileName.endsWith('.js')) continue;
     const filePath = path.join(apiPath, fileName);
     const serviceName = path.basename(fileName, '.js');
-    routing[serviceName] = await load(filePath, sandbox);
+    routing[serviceName] = await load(config.sandbox)(filePath, sandbox);
   }
 
-  staticServer(config.staticRootPath, config.staticPort);
-  server(routing, config.serverPort);
+  staticServer(config.static.path, config.static.port);
+  server(routing, config.api.port);
 })();

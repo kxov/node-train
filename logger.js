@@ -37,7 +37,7 @@ class Logger {
     this.stream.write(out);
   }
 
-  log(...args) {
+  info(...args) {
     const msg = util.format(...args);
     this.write('info', msg);
   }
