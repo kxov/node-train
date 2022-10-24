@@ -1,6 +1,16 @@
 'use strict';
 
-const http = require('http');
+const http = require('node:http');
+
+const HEADERS = {
+  'X-XSS-Protection': '1; mode=block',
+  'X-Content-Type-Options': 'nosniff',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubdomains; preload',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json; charset=UTF-8',
+};
 
 const receiveArgs = async (req) => {
   const buffers = [];
@@ -9,8 +19,9 @@ const receiveArgs = async (req) => {
   return JSON.parse(data);
 };
 
-module.exports = (logger) => (routing, port) => {
+module.exports = (routing, port, logger) => {
   http.createServer(async (req, res) => {
+    res.writeHead(200, HEADERS);
     const { url, socket } = req;
     const [name, method, id] = url.substring(1).split('/');
     const entity = routing[name];
@@ -22,15 +33,11 @@ module.exports = (logger) => (routing, port) => {
     const args = [];
     if (signature.includes('(id')) args.push(id);
     if (signature.includes('{')) args.push(await receiveArgs(req));
-    logger.log(`${socket.remoteAddress} ${method} ${url}`);
+    logger.info(`${socket.remoteAddress} ${method} ${url}`);
     const result = await handler(...args);
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 
     res.end(JSON.stringify(result.rows));
   }).listen(port);
 
-  logger.log(`API on port ${port}`);
+  logger.info(`API on port ${port}`);
 };

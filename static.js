@@ -4,7 +4,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
-module.exports = (root, port) => {
+module.exports = (root, port, console) => {
   http.createServer(async (req, res) => {
     const url = req.url === '/' ? '/index.html' : req.url;
     const filePath = path.join(root, url);
@@ -17,5 +17,5 @@ module.exports = (root, port) => {
     }
   }).listen(port);
 
-  console.log(`Static on port ${port}`);
+  console.info(`Static on port ${port}`);
 };

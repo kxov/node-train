@@ -2,7 +2,7 @@
 
 const { Server } = require('ws');
 
-module.exports = (logger) => (routing, port) => {
+module.exports = (routing, port, logger) => {
   const ws = new Server({ port });
 
   ws.on('connection', (connection, req) => {
