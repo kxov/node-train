@@ -18,7 +18,8 @@ const serviceIterator = (structure, callback) => {
 };
 
 transport.http = (url) => (structure) => {
-  const api = serviceIterator(structure, (name, method) => (...args) => new Promise((resolve, reject) => {
+  const api = serviceIterator(structure,
+      (name, method) => (...args) => new Promise((resolve, reject) => {
     fetch(`${url}/${name}/${method}/${args.join('')}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -35,7 +36,8 @@ transport.http = (url) => (structure) => {
 transport.ws = (url) => (structure) => {
   const socket = new WebSocket(url);
 
-  const api = serviceIterator(structure, (name, method) => (...args) => new Promise((resolve) => {
+  const api = serviceIterator(structure,
+      (name, method) => (...args) => new Promise((resolve) => {
     const packet = { name, method, args };
     socket.send(JSON.stringify(packet));
     socket.onmessage = (event) => {

@@ -6,7 +6,7 @@ const fsp = require('fs').promises;
 const path = require('path');
 
 const db = require('./db.js')(config.db);
-const transport = require(`./${config.transport}.js`);
+const transport = require(`./transport/${config.transport}.js`);
 const staticServer = require('./static.js');
 
 const load = require('./load.js')(config.sandbox);
