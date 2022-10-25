@@ -3,11 +3,11 @@
 module.exports = {
     static: {
         port: 8000,
-        path: './static'
+        root: './static'
     },
     api: {
         port: 8001,
-        path: './api'
+        root: './api'
     },
     transport: 'ws',
     logger: 'pino',

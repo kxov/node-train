@@ -5,10 +5,11 @@ const config = require('./config.js');
 const fsp = require('fs').promises;
 const path = require('path');
 
+const db = require('./db.js')(config.db);
 const transport = require(`./${config.transport}.js`);
 const staticServer = require('./static.js');
+
 const load = require('./load.js')(config.sandbox);
-const db = require('./db.js')(config.db);
 const hash = require('./hash.js');
 
 const loggers = {
@@ -22,7 +23,7 @@ const sandbox = {
   db: Object.freeze(db),
   common: { hash },
 };
-const apiPath = path.join(process.cwd(), config.api.path);
+const apiPath = path.join(process.cwd(), config.api.root);
 const routing = {};
 
 (async () => {
@@ -34,6 +35,6 @@ const routing = {};
     routing[serviceName] = await load(filePath, sandbox);
   }
 
-  staticServer(config.static.path, config.static.port, sandbox.console);
+  staticServer(config.static, sandbox.console);
   transport(routing, config.api.port, sandbox.console);
 })();
