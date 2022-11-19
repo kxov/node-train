@@ -20,7 +20,7 @@ const serviceIterator = (structure, callback) => {
 transport.http = (url) => (structure) => {
   const api = serviceIterator(structure,
       (name, method) => (...args) => new Promise((resolve, reject) => {
-    fetch(`${url}/${name}/${method}/${args.join('')}`, {
+    fetch(`${url}/api/${name}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ args }),
@@ -57,7 +57,7 @@ const scaffold = (url) => {
 };
 
 (async () => {
-  const api = await scaffold('ws://localhost:8001')({
+  const api = await scaffold('http://localhost:8001')({
     user: {
       create: ['record'],
       read: ['id'],
@@ -74,6 +74,11 @@ const scaffold = (url) => {
       say: ['message'],
     }
   });
-  const data = await api.country.read(3);
-  console.dir({ data });
+
+  const data = await api.user.read();
+  console.dir( data );
+
+   // const user = await api.user.create({ login: 'login', password: 'pass' });
+   //
+   // console.log(user);
 })();

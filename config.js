@@ -9,7 +9,7 @@ module.exports = {
         port: 8001,
         root: './api'
     },
-    transport: 'ws',
+    transport: 'http',
     logger: 'pino',
     sandbox: {
         timeout: 5000,

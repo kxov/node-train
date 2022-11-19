@@ -9,7 +9,7 @@ const db = require('./db.js')(config.db);
 const transport = require(`./transport/${config.transport}.js`);
 const staticServer = require('./static.js');
 
-const load = require('./load.js')(config.sandbox);
+//const load = require('./load.js')(config.sandbox);
 const hash = require('./hash.js');
 
 const loggers = {
