@@ -36,7 +36,7 @@ interface Occupation {
 
 interface Artist {
   name: string;
-  age: number;
+  age: string;
   occupationId: string[];
   groupId: string[];
   artistId?: string;

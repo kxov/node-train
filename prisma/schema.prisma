@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("DATABASE_URL")
+}
+
+model Account {
+  accountId   BigInt        @id(map: "pkAccount") @default(autoincrement())
+  login       String        @unique(map: "akAccountLogin") @db.VarChar(64)
+  password    String        @db.VarChar
+  AccountRole AccountRole[]
+  Area        Area[]
+  AreaAccount AreaAccount[]
+  Message     Message[]
+  Session     Session[]
+}
+
+model AccountRole {
+  accountId BigInt
+  roleId    BigInt
+  Account   Account @relation(fields: [accountId], references: [accountId], onDelete: Cascade, onUpdate: NoAction, map: "fkAccountRoleAccount")
+  Role      Role    @relation(fields: [roleId], references: [roleId], onDelete: Cascade, onUpdate: NoAction, map: "fkAccountRoleRole")
+
+  @@id([accountId, roleId], map: "pkAccountRole")
+}
+
+model Album {
+  albumId   BigInt      @id(map: "pkAlbum") @default(autoincrement())
+  name      String      @db.VarChar
+  groupId   BigInt
+  Group     Group       @relation(fields: [groupId], references: [groupId], onDelete: NoAction, onUpdate: NoAction, map: "fkAlbumGroup")
+  SongAlbum SongAlbum[]
+}
+
+model Area {
+  areaId      BigInt        @id(map: "pkArea") @default(autoincrement())
+  name        String        @unique(map: "akAreaName") @db.VarChar
+  ownerId     BigInt
+  Account     Account       @relation(fields: [ownerId], references: [accountId], onDelete: NoAction, onUpdate: NoAction, map: "fkAreaOwner")
+  AreaAccount AreaAccount[]
+  Message     Message[]
+}
+
+model AreaAccount {
+  areaId    BigInt
+  accountId BigInt
+  Account   Account @relation(fields: [accountId], references: [accountId], onDelete: Cascade, onUpdate: NoAction, map: "fkAreaAccountAccount")
+  Area      Area    @relation(fields: [areaId], references: [areaId], onDelete: Cascade, onUpdate: NoAction, map: "fkAreaAccountArea")
+
+  @@id([areaId, accountId], map: "pkAreaAccount")
+}
+
+model Artist {
+  artistId         BigInt             @id(map: "pkArtist") @default(autoincrement())
+  name             String             @db.VarChar(64)
+  age              DateTime           @db.Date
+  ArtistGroup      ArtistGroup[]
+  ArtistOccupation ArtistOccupation[]
+}
+
+model ArtistGroup {
+  artistId BigInt
+  groupId  BigInt
+  Artist   Artist @relation(fields: [artistId], references: [artistId], onDelete: Cascade, onUpdate: NoAction, map: "fkArtistGroupArtist")
+  Group    Group  @relation(fields: [groupId], references: [groupId], onDelete: Cascade, onUpdate: NoAction, map: "fkArtistGroupGroup")
+
+  @@id([artistId, groupId], map: "pkArtistGroup")
+}
+
+model ArtistOccupation {
+  artistId     BigInt
+  occupationId BigInt
+  Artist       Artist     @relation(fields: [artistId], references: [artistId], onDelete: Cascade, onUpdate: NoAction, map: "fkArtistOccupationArtist")
+  Occupation   Occupation @relation(fields: [occupationId], references: [occupationId], onDelete: Cascade, onUpdate: NoAction, map: "fkArtistOccupationOccupation")
+
+  @@id([artistId, occupationId], map: "pkArtistOccupation")
+}
+
+model Group {
+  groupId     BigInt        @id(map: "pkGroup") @default(autoincrement())
+  name        String        @unique(map: "akGroupName") @db.VarChar
+  genre       String        @db.VarChar
+  Album       Album[]
+  ArtistGroup ArtistGroup[]
+}
+
+model Message {
+  messageId BigInt  @id(map: "pkMessage") @default(autoincrement())
+  areaId    BigInt
+  fromId    BigInt
+  text      String  @db.VarChar
+  Area      Area    @relation(fields: [areaId], references: [areaId], onDelete: NoAction, onUpdate: NoAction, map: "fkMessageArea")
+  Account   Account @relation(fields: [fromId], references: [accountId], onDelete: NoAction, onUpdate: NoAction, map: "fkMessageFrom")
+}
+
+model Occupation {
+  occupationId     BigInt             @id(map: "pkOccupation") @default(autoincrement())
+  name             String             @unique(map: "akOccupationName") @db.VarChar
+  ArtistOccupation ArtistOccupation[]
+}
+
+model Role {
+  roleId      BigInt        @id(map: "pkRole") @default(autoincrement())
+  name        String        @unique(map: "akRoleName") @db.VarChar
+  AccountRole AccountRole[]
+}
+
+model Session {
+  sessionId BigInt  @id(map: "pkSession") @default(autoincrement())
+  accountId BigInt
+  token     String  @unique(map: "akSessionToken") @db.VarChar
+  ip        String  @db.Inet
+  data      Json
+  Account   Account @relation(fields: [accountId], references: [accountId], onDelete: NoAction, onUpdate: NoAction, map: "fkSessionAccount")
+}
+
+model Song {
+  songId    BigInt      @id(map: "pkSong") @default(autoincrement())
+  name      String      @db.VarChar
+  SongAlbum SongAlbum[]
+}
+
+model SongAlbum {
+  songId  BigInt
+  albumId BigInt
+  Album   Album  @relation(fields: [albumId], references: [albumId], onDelete: Cascade, onUpdate: NoAction, map: "fkSongAlbumAlbum")
+  Song    Song   @relation(fields: [songId], references: [songId], onDelete: Cascade, onUpdate: NoAction, map: "fkSongAlbumSong")
+
+  @@id([songId, albumId], map: "pkSongAlbum")
+}

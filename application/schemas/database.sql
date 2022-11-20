@@ -66,7 +66,7 @@ CREATE UNIQUE INDEX "akOccupationName" ON "Occupation" ("name");
 CREATE TABLE "Artist" (
   "artistId" bigint generated always as identity,
   "name" varchar(64) NOT NULL,
-  "age" integer(100) NOT NULL
+  "age" date NOT NULL
 );
 
 ALTER TABLE "Artist" ADD CONSTRAINT "pkArtist" PRIMARY KEY ("artistId");
