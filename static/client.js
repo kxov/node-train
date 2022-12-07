@@ -58,9 +58,9 @@ const scaffold = (url) => {
 
 (async () => {
   const api = await scaffold('http://localhost:8001')({
-    user: {
+    account: {
       create: ['record'],
-      read: ['id'],
+      read: ['accountId'],
       update: ['id', 'record'],
       delete: ['id'],
       find: ['mask'],
@@ -75,10 +75,10 @@ const scaffold = (url) => {
     }
   });
 
-  const data = await api.user.read();
+  const data = await api.account.read(1);
   console.dir( data );
 
-   // const user = await api.user.create({ login: 'login', password: 'pass' });
+  //const user = await api.account.create({ login: 'login', password: 'pass' });
    //
-   // console.log(user);
+  //console.log(user);
 })();

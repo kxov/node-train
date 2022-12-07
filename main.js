@@ -5,23 +5,23 @@ const config = require('./config.js');
 const fsp = require('fs').promises;
 const path = require('path');
 
-const db = require('./db.js')(config.db);
+const db = require('./lib/db.js')(config.db);
 const transport = require(`./transport/${config.transport}.js`);
-const staticServer = require('./static.js');
+const staticServer = require('./lib/static.js');
 
 //const load = require('./load.js')(config.sandbox);
-const hash = require('./hash.js');
+const common = require('./lib/common.js');
 
 const loggers = {
   node: console,
-  fs: require('./logger.js'),
+  fs: require('./lib/logger.js'),
   pino: require('pino')(),
 };
 
 const sandbox = {
   console: Object.freeze(loggers[config.logger]),
   db: Object.freeze(db),
-  common: { hash },
+  common: Object.freeze(common),
 };
 const apiPath = path.join(process.cwd(), config.api.root);
 const routing = {};
